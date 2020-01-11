@@ -6,6 +6,7 @@ LABEL version="1.2.0.0"
 
 ARG verlihubver=1.2.0.0
 
+ENV DEBIAN_FRONTEND noninteractive
 ENV DESTDIR /verlihub
 
 WORKDIR /verlihub-build
@@ -21,6 +22,10 @@ RUN apt-get update && \
 FROM ubuntu:xenial
 # I need a certain version to build, but what about to run?
 COPY --from=0 /verlihub/ /verlihub/
-CMD ["/verlihub/usr/local/bin/vh", "--run"]
-EXPOSE 411/tcp
+RUN apt-get update && \
+ apt-get install -y rsync && \
+ rsync -a /verlihub/ / && \
+ apt-get install -y libmysqlclient20 libmaxminddb0 libicu55 libasprintf0v5 mysql-client
+CMD ["verlihub"]
+EXPOSE 4111/tcp
 
